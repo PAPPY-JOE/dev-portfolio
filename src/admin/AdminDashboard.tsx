@@ -1417,7 +1417,7 @@ export function AdminDashboard() {
                     <h2 className="text-2xl font-bold">Contact Messages</h2>
                     <p className="text-terminal-muted text-sm mt-1">
                       {messages.length} total •{' '}
-                      {messages.filter((m) => m.status === 'new').length} new {JSON.stringify(isFirebaseConfigured())}
+                      {messages.filter((m) => m.status === 'new').length} new 
                     </p>
                   </div>
                   {!isFirebaseConfigured() && (
