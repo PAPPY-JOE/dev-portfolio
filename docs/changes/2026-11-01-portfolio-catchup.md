@@ -18,3 +18,6 @@ Five existing hook/development-only lint warnings remain. Locked dependency audi
 
 ## Review and merge outcome
 Draft for owner review. Unmerged; no live CMS write and no production deployment. Review/merge outcome and PR link will be updated after verification.
+
+
+Verified draft review link: https://github.com/PAPPY-JOE/dev-portfolio/pull/1. Review and merge remain pending.

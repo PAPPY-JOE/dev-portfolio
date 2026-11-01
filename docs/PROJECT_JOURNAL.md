@@ -9,3 +9,8 @@ The deployed bundle uses Firebase project `dev-jay-portfolio`, document `portfol
 Added a pure reconciliation step that appends missing hidden draft placeholders to cloud/local content and forces those protected draft IDs to remain unpublished. Removed the public read path's automatic Firestore initialization write. No live Firebase document was written. Added PR documentation template and CI record check, targeted reconciliation tests, Vite types and small existing unused-import/lint fixes.
 
 Verification and review details: `docs/changes/2026-11-01-portfolio-catchup.md`. Draft PR pending review; no merge or production deployment authorized. Future review/merge outcomes must be recorded only once verified.
+
+
+## 2026-11-01 · Draft PR opened
+
+Verified cloud review: https://github.com/PAPPY-JOE/dev-portfolio/pull/1. State: draft, open, unmerged. GitHub Actions PR quality workflow started. Required-check enforcement is being inspected separately; do not interpret workflow presence as branch protection. Local checks passed as recorded in the dated change record.
