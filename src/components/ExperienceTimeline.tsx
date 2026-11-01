@@ -1,11 +1,11 @@
-import React from 'react';
-import { Briefcase, Calendar, MapPin } from 'lucide-react';
+
+import { Calendar, MapPin } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
 export function ExperienceTimeline() {
   const { content } = useContent();
   return (
     <div className="space-y-8 relative pl-8 border-l border-terminal-border ml-4">
-      {content.experience.map((job, index) =>
+      {content.experience.map((job) =>
       <div key={job.id} className="relative">
           {/* Timeline Dot */}
           <div className="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-terminal-black border-2 border-accent-blue flex items-center justify-center">

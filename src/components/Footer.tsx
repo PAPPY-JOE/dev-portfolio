@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Github, Linkedin, Heart, Mail } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
 export function Footer() {
