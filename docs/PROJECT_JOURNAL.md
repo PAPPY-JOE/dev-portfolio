@@ -14,3 +14,8 @@ Verification and review details: `docs/changes/2026-11-01-portfolio-catchup.md`.
 ## 2026-11-01 · Draft PR opened
 
 Verified cloud review: https://github.com/PAPPY-JOE/dev-portfolio/pull/1. State: draft, open, unmerged. GitHub Actions PR quality workflow started. Required-check enforcement is being inspected separately; do not interpret workflow presence as branch protection. Local checks passed as recorded in the dated change record.
+
+
+## 2026-11-01 · Verified cloud validation and enforcement status
+
+Verified GitHub Actions run 41270245170: documentation and tests/lint/typecheck/build all passed. Netlify deploy-preview check passed at https://deploy-preview-1--josephfatoye.netlify.app; production was not changed. Required-check protection for main was prepared but automatic approval review rejected saving it, because repository-level persistent merge policy needs separate authorization. No protection rule was saved.
