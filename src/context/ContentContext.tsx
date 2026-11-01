@@ -1,6 +1,7 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { SiteContent, Project, Experience, SkillCategory } from '../types';
 import { initialContent } from '../data/initialContent';
+import { withPortfolioDrafts } from '../data/portfolioDrafts';
 import {
   getContent,
   updateFirestoreContent,
@@ -37,14 +38,14 @@ export function ContentProvider({ children }: {children: React.ReactNode;}) {
         // Fallback to localStorage
         const saved = localStorage.getItem('portfolio_content');
         if (saved) {
-          setContent(JSON.parse(saved));
+          setContent(withPortfolioDrafts(JSON.parse(saved)));
         }
         setIsLoading(false);
         return;
       }
       try {
         const firebaseContent = await getContent();
-        setContent(firebaseContent);
+        setContent(withPortfolioDrafts(firebaseContent));
       } catch (error) {
         console.error('Error loading content:', error);
       }
@@ -54,7 +55,7 @@ export function ContentProvider({ children }: {children: React.ReactNode;}) {
     // Subscribe to real-time updates if Firebase is configured
     if (isFirebaseConfigured()) {
       const unsubscribe = subscribeToContent((newContent) => {
-        setContent(newContent);
+        setContent(withPortfolioDrafts(newContent));
       });
       return () => unsubscribe();
     }
@@ -67,7 +68,7 @@ export function ContentProvider({ children }: {children: React.ReactNode;}) {
       } else {
         localStorage.setItem('portfolio_content', JSON.stringify(newContent));
       }
-      setContent(newContent);
+      setContent(withPortfolioDrafts(newContent));
     } catch (error) {
       console.error('Error saving content:', error);
       throw error;

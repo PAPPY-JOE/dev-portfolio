@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   ExternalLink,
   Github,
   ChevronDown,
   ChevronUp,
   Folder,
-  Image } from
+  } from
 'lucide-react';
 import { useContent } from '../context/ContentContext';
 export function ProjectsSection() {

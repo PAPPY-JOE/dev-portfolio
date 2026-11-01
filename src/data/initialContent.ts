@@ -1,4 +1,5 @@
 import { SiteContent } from '../types';
+import { portfolioDrafts } from './portfolioDrafts';
 
 export const initialContent: SiteContent = {
   hero: {
@@ -20,6 +21,7 @@ export const initialContent: SiteContent = {
     }
   },
   projects: [
+  ...portfolioDrafts,
   {
     id: '1',
     title: 'Missions Aid International',

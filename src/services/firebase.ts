@@ -83,8 +83,8 @@ export const getContent = async (): Promise<SiteContent> => {
     if (docSnap.exists()) {
       return docSnap.data() as SiteContent
     } else {
-      // Initialize with default content if document doesn't exist
-      await setDoc(docRef, initialContent)
+      // A public read must never initialize or overwrite cloud content.
+
       return initialContent
     }
   } catch (error) {
@@ -246,7 +246,7 @@ export const subscribeToMessages = (
     // Demo mode - just call callback with localStorage data
     callback(JSON.parse(localStorage.getItem('portfolio_messages') || '[]'))
     // Return a no-op unsubscribe function
-    return () => {}
+    return () => { /* No live subscription in demo mode. */ }
   }
 
   const q = query(
