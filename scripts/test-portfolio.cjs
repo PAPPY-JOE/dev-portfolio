@@ -1,0 +1,60 @@
+/* eslint-env node */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const Module = require('node:module');
+const ts = require('typescript');
+const React = require('react');
+const { renderToStaticMarkup } = require('react-dom/server');
+for (const ext of ['.ts', '.tsx']) require.extensions[ext] = (mod, file) => mod._compile(ts.transpileModule(fs.readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020 } }).outputText, file);
+const { initialContent } = require('../src/data/initialContent.ts');
+const { refreshPortfolioContent, orderedProjects } = require('../src/data/portfolio.ts');
+const legacy = structuredClone(initialContent);
+legacy.projects = legacy.projects.filter(project => project.id !== 'valet');
+legacy.experience = legacy.experience.filter(job => job.company !== 'Valet');
+legacy.hero.title = 'Frontend Engineer'; legacy.hero.location = 'Remote';
+legacy.hero.bio = 'Frontend Engineer with 5+ years of experience building and maintaining production React applications, including SaaS-style platforms and internal admin dashboards.';
+legacy.hero.subtitle = 'Building accessible, pixel-perfect web experiences';
+legacy.about.bio = 'I am a Frontend Engineer with 5+ years of web development experience.';
+const source = JSON.stringify(legacy), current = refreshPortfolioContent(legacy);
+assert.equal(JSON.stringify(legacy), source); assert.equal(current.hero.title, 'Software Engineer'); assert.equal(current.hero.location, 'Lagos, Nigeria');
+assert.equal(current.projects.filter(project => project.title === 'Valet').length, 1); assert.equal(current.experience.filter(job => job.company === 'Valet').length, 1);
+assert.deepEqual(refreshPortfolioContent(current), current);
+assert.equal(current.projects.find(project => project.title.startsWith('CitiCompass')).image, legacy.projects.find(project => project.title.startsWith('CitiCompass')).image);
+const custom = structuredClone(current); custom.hero.bio = 'My new introduction.'; custom.hero.subtitle = 'A new headline'; custom.about.bio = 'My own summary.';
+custom.projects.find(project => project.title === 'Valet').published = false;
+custom.projects.push({ ...custom.projects[0], id: 'other', title: 'Another project', published: true });
+const preserved = refreshPortfolioContent(custom);
+assert.equal(preserved.hero.bio, custom.hero.bio); assert.equal(preserved.hero.subtitle, custom.hero.subtitle); assert.equal(preserved.about.bio, custom.about.bio);
+assert.equal(preserved.projects.filter(project => project.title === 'Valet').length, 1); assert(!orderedProjects(preserved.projects).some(project => project.title === 'Valet'));
+assert(orderedProjects(preserved.projects).some(project => project.title === 'Another project'));
+const orderBefore = current.projects.map(project => project.id); assert.equal(orderedProjects(current.projects)[0].title, 'Valet'); assert(orderedProjects(current.projects)[1].title.startsWith('CitiCompass')); assert.equal(orderedProjects(current.projects).at(-1).title, 'Bxpense'); assert.deepEqual(current.projects.map(project => project.id), orderBefore);
+console.log('PASS: old CMS compatibility, immutable source data, idempotent highlights, custom copy, unpublished choices and project order');
+function component(file, mocks) {
+  const full = path.resolve(file), local = Module.createRequire(full), mod = { exports: {} };
+  new vm.Script(ts.transpileModule(fs.readFileSync(full, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020 } }).outputText).runInNewContext({ module: mod, exports: mod.exports, require: name => Object.hasOwn(mocks, name) ? mocks[name] : local(name) });
+  return mod.exports;
+}
+const mockContent = { useContent: () => ({ content: current }) };
+const { ProjectsSection } = component('src/components/ProjectsSection.tsx', { '../context/ContentContext': mockContent });
+const projects = renderToStaticMarkup(React.createElement(ProjectsSection));
+assert(projects.indexOf('View Valet') < projects.indexOf('Read case study')); assert(projects.includes('Working pilot')); assert(projects.includes('Sample wardrobe shown')); assert(projects.includes('University side project')); assert(projects.includes('Prototype')); assert(projects.includes('https://valet-os.netlify.app/')); assert(!projects.includes('href="#"'));
+const { TerminalHero } = component('src/components/TerminalHero.tsx', { '../context/ContentContext': mockContent });
+const hero = renderToStaticMarkup(React.createElement(TerminalHero)); assert(hero.includes('<h1>')); assert(hero.includes(current.hero.subtitle)); assert(hero.includes('Currently building')); assert(!hero.includes('whoami')); assert(!hero.includes('Based in Remote'));
+console.log('PASS: immediately rendered introduction, public product links, explicit prototype/pilot/student status and native case-study disclosure');
+const find = (node, test) => { if (!node || typeof node !== 'object') return null; if (test(node)) return node; return React.Children.toArray(node.props?.children).map(child => find(child, test)).find(Boolean); };
+(async () => {
+  const states = []; let index = 0, fail = true, writes = [], release;
+  const hooks = { useState: initial => { const at = index++; if (!(at in states)) states[at] = initial; return [states[at], value => { states[at] = typeof value === 'function' ? value(states[at]) : value; }]; } };
+  const { ContactForm } = component('src/components/ContactForm.tsx', { react: hooks, '../context/ContentContext': mockContent, '../services/firebase': { submitContactMessage: async value => { writes.push(structuredClone(value)); await new Promise(resolve => { release = resolve; }); if (fail) throw Error('Offline'); return 'fake-id'; } } });
+  const render = () => { index = 0; return ContactForm(); };
+  let tree = render();
+  for (const [id, value] of [['contact-name', 'Synthetic reviewer'], ['contact-email', 'review@example.com'], ['contact-message', 'Local transport test']]) { find(tree, node => node.props.id === id).props.onChange({ target: { value } }); tree = render(); }
+  const pending = find(tree, node => node.type === 'form').props.onSubmit({ preventDefault() {} }); tree = render();
+  assert(find(tree, node => node.type === 'button' && node.props.type === 'submit').props.disabled); assert.equal(writes.length, 1);
+  release(); await pending; tree = render(); assert(find(tree, node => node.props.role === 'alert')); assert.equal(find(tree, node => node.props.id === 'contact-message').props.value, 'Local transport test');
+  fail = false; const retry = find(tree, node => node.type === 'form').props.onSubmit({ preventDefault() {} }); assert.deepEqual(writes[0], writes[1]); release(); await retry; tree = render(); assert(find(tree, node => node.props.role === 'status'));
+  find(tree, node => node.type === 'button').props.onClick(); tree = render(); assert.equal(find(tree, node => node.props.id === 'contact-name').props.value, ''); assert(find(tree, node => node.props.href === 'mailto:' + current.social.email));
+  console.log('PASS: contact pending state, unchanged failure draft, same-message retry and success-only reset through an isolated fake transport');
+})().catch(error => { console.error(error); process.exitCode = 1; });

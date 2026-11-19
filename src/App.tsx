@@ -34,16 +34,12 @@ function LoadingScreen() {
 }
 function HomePage() {
   const { isLoading } = useContent();
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
   return (
-    <div className="min-h-screen bg-terminal-black text-terminal-text selection:bg-accent-green/30 selection:text-accent-green">
+    <div className="portfolio">
       <Navigation />
-      <main>
+      <main id="main-content" aria-busy={isLoading}>
         <TerminalHero />
-        <div className="relative">
-          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-terminal-border -z-10 hidden md:block"></div>
+        <div>
           <ProjectsSection />
           <AboutSection />
           <SkillsSection />

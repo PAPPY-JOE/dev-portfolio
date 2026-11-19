@@ -246,7 +246,7 @@ export const subscribeToMessages = (
     // Demo mode - just call callback with localStorage data
     callback(JSON.parse(localStorage.getItem('portfolio_messages') || '[]'))
     // Return a no-op unsubscribe function
-    return () => {}
+    return () => undefined
   }
 
   const q = query(
@@ -266,4 +266,4 @@ export const subscribeToMessages = (
       console.error('Error subscribing to messages:', error)
     },
   )
-}  
+}
