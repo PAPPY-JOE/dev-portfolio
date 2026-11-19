@@ -184,6 +184,31 @@ html { scroll-behavior: smooth; }
   .portfolio .skills-grid { grid-template-columns: 1fr; }
   .portfolio .earlier-heading { align-items: start; flex-direction: column; gap: 8px; }
 }
+@keyframes portfolio-enter {
+  from { opacity: .65; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .portfolio .hero-copy { animation: portfolio-enter 550ms cubic-bezier(.2,.7,.2,1); }
+  .portfolio .hero-portrait { animation: portfolio-enter 650ms 70ms cubic-bezier(.2,.7,.2,1) backwards; }
+  .portfolio .button, .portfolio .project-card, .portfolio .portrait-frame {
+    transition: transform 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  }
+  .portfolio .project-image img { transition: transform 450ms cubic-bezier(.2,.7,.2,1); }
+  .portfolio a, .portfolio summary { transition: color 180ms ease; }
+  .portfolio summary svg { transition: transform 220ms ease; }
+  .portfolio .contact-panel input, .portfolio .contact-panel textarea { transition: border-color 180ms ease; }
+  .portfolio .contact-panel input:focus, .portfolio .contact-panel textarea:focus { border-color: var(--green); }
+  .portfolio .project-card:focus-within { border-color: var(--muted); }
+  .portfolio .button:focus-visible { transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .portfolio .button:hover { transform: translateY(-2px); }
+  .portfolio .button:active { transform: translateY(0); }
+  .portfolio .project-card:hover { border-color: var(--muted); }
+  .portfolio .project-card:hover .project-image img { transform: scale(1.025); }
+  .portfolio .portrait-frame:hover { transform: translateY(-3px); border-color: var(--muted); }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .portfolio *, .portfolio *::before, .portfolio *::after { animation: none !important; transition: none !important; }
