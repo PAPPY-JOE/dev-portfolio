@@ -17,6 +17,7 @@ import { AdminDashboard } from './admin/AdminDashboard';
 import { ContentProvider, useContent } from './context/ContentContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { usePortfolioMotion } from './hooks/usePortfolioMotion';
 function LoadingScreen() {
   return (
     <div className="min-h-screen bg-terminal-black flex items-center justify-center">
@@ -33,9 +34,10 @@ function LoadingScreen() {
 
 }
 function HomePage() {
-  const { isLoading } = useContent();
+  const { content, isLoading } = useContent();
+  const motionRoot = usePortfolioMotion(content);
   return (
-    <div className="portfolio">
+    <div className="portfolio" ref={motionRoot}>
       <Navigation />
       <main id="main-content" aria-busy={isLoading}>
         <TerminalHero />
