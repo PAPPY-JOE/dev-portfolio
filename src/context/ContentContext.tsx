@@ -1,6 +1,7 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { SiteContent, Project, Experience, SkillCategory } from '../types';
 import { initialContent } from '../data/initialContent';
+import { refreshPortfolioContent } from '../data/portfolio';
 import {
   getContent,
   updateFirestoreContent,
@@ -37,14 +38,14 @@ export function ContentProvider({ children }: {children: React.ReactNode;}) {
         // Fallback to localStorage
         const saved = localStorage.getItem('portfolio_content');
         if (saved) {
-          setContent(JSON.parse(saved));
+          setContent(refreshPortfolioContent(JSON.parse(saved)));
         }
         setIsLoading(false);
         return;
       }
       try {
         const firebaseContent = await getContent();
-        setContent(firebaseContent);
+        setContent(refreshPortfolioContent(firebaseContent));
       } catch (error) {
         console.error('Error loading content:', error);
       }
@@ -54,7 +55,7 @@ export function ContentProvider({ children }: {children: React.ReactNode;}) {
     // Subscribe to real-time updates if Firebase is configured
     if (isFirebaseConfigured()) {
       const unsubscribe = subscribeToContent((newContent) => {
-        setContent(newContent);
+        setContent(refreshPortfolioContent(newContent));
       });
       return () => unsubscribe();
     }

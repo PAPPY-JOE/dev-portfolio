@@ -14,6 +14,14 @@ export interface Project {
   published: boolean;
 }
 
+export interface ProjectNotes {
+  role: string;
+  status: string;
+  problem: string;
+  decisions: string[];
+  outcome: string;
+}
+
 export interface Experience {
   id: string;
   company: string;

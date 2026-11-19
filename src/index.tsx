@@ -1,6 +1,8 @@
 import './index.css';
-import React from "react";
-import { render } from "react-dom";
-import { App } from "./App";
+import './portfolio.css';
+import { createRoot } from 'react-dom/client';
+import { App } from './App';
 
-render(<App />, document.getElementById("root"));
+const root = document.getElementById('root');
+if (!root) throw new Error('Portfolio root element is missing.');
+createRoot(root).render(<App />);
